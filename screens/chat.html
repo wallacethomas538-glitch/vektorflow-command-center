@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script src="js/vf-config.js"></script><script src="js/vf-api.js"></script><script src="js/vf-voice.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-dim": "#10141a", "outline-variant": "#3b494c", "on-primary-container": "#00626e", "on-primary": "#00363d", "on-background": "#dfe2eb", "on-primary-fixed-variant": "#004f58", "secondary-container": "#0065f6", "on-secondary": "#002b73", "secondary-fixed-dim": "#b2c5ff", "on-tertiary-fixed-variant": "#005226", "on-secondary-container": "#f3f3ff", "tertiary-fixed-dim": "#00e475", "on-secondary-fixed": "#001848", "on-primary-fixed": "#001f24", "surface-container-low": "#181c22", "surface-container": "#1c2026", "surface-bright": "#353940", "tertiary": "#b1ffbf", "surface-variant": "#31353c", "on-tertiary": "#003918", "inverse-primary": "#006875", "secondary": "#b2c5ff", "inverse-surface": "#dfe2eb", "primary-container": "#00e5ff", "on-error-container": "#ffdad6", "surface-container-highest": "#31353c", "surface": "#10141a", "surface-container-lowest": "#0a0e14", "secondary-fixed": "#dae2ff", "primary-fixed": "#9cf0ff", "on-tertiary-fixed": "#00210b", "primary": "#c3f5ff", "on-tertiary-container": "#006731", "surface-tint": "#00daf3", "on-surface-variant": "#bac9cc", "tertiary-fixed": "#62ff96", "on-error": "#690005", "background": "#10141a", "inverse-on-surface": "#2d3137", "on-surface": "#dfe2eb", "tertiary-container": "#22ef7e", "surface-container-high": "#262a31", "primary-fixed-dim": "#00daf3", "on-secondary-fixed-variant": "#0040a1", "outline": "#849396", "error": "#ffb4ab", "error-container": "#93000a" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1.5rem", "margin": "1rem", "space-md": "1rem", "space-sm": "0.5rem", "space-xl": "2rem", "space-xs": "0.25rem", "gutter": "1rem" }, fontFamily: { "headline-sm": ["Space Grotesk"], "display-lg-mobile": ["Space Grotesk"], "label-mono-lg": ["JetBrains Mono"], "label-mono-sm": ["JetBrains Mono"], "headline-md": ["Space Grotesk"], "headline-lg": ["Space Grotesk"], "display-lg": ["Space Grotesk"], "body-md": ["Inter"], "body-sm": ["Inter"], "body-lg": ["Inter"], "label-mono-md": ["JetBrains Mono"] }, fontSize: { "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "display-lg-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-mono-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }], "label-mono-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.08em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-mono-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#10141a;color:#dfe2eb;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.6)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="VektorFlow Logo" class="h-8 w-auto object-contain shrink-0" src="../assets/vektorflow-logo-pro.webp"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-wider uppercase text-primary truncate">VEKTORFLOW</span><div class="h-1.5 w-1.5 rounded-full bg-tertiary-container animate-pulse shadow-[0_0_8px_#22ef7e]"></div></div><span class="font-label-mono-sm text-label-mono-sm uppercase text-outline tracking-widest truncate">SYS: Chat</span></div></div><div class="flex items-center gap-space-sm shrink-0"><button id="ttsToggle" type="button" title="Voice readout" class="flex items-center justify-center w-8 h-8 rounded-full border border-white/10 text-outline hover:text-primary-container active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]" id="ttsToggleIcon">volume_off</span></button><div class="flex items-center gap-space-xs bg-surface-container px-space-xs py-0.5 rounded-full shadow-[inset_0_1px_0_0_rgba(0,229,255,0.15)]"><span class="font-label-mono-sm text-label-mono-sm text-tertiary-fixed-dim uppercase px-1">ONLINE</span></div><div class="relative flex items-center justify-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_0_10px_rgba(0,229,255,0.25)]" src="../assets/vektormind-avatar.png"/><div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-tertiary-container rounded-full ring-2 ring-surface-container-lowest"></div></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full relative">
+<!-- Ambient Atmospheric Backing Glows -->
+<div class="pointer-events-none fixed inset-0 overflow-hidden z-0">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary-container/5 rounded-full blur-[100px]"></div>
+<div class="absolute top-1/3 -right-24 w-72 h-72 bg-secondary-container/5 rounded-full blur-[90px]"></div>
+<div class="absolute bottom-20 left-4 w-60 h-60 bg-tertiary-container/5 rounded-full blur-[80px]"></div>
+</div>
+<!-- Operational Core Header Panel -->
+<section class="relative z-10 px-margin pt-space-xs pb-space-sm">
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-space-md rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+<div class="flex items-center justify-between gap-space-sm">
+<!-- Agent Identity & Neural Status -->
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-xl overflow-hidden shadow-[0_0_16px_rgba(0,229,255,0.35)] bg-surface-container-lowest">
+<img alt="VektorMind Core" class="w-full h-full object-cover" src="../assets/vektormind-avatar.png"/>
+</div>
+<span class="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-surface-container-lowest">
+<span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-tertiary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary-container shadow-[0_0_8px_#22ef7e]"></span>
+</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h1 class="font-headline-sm text-headline-sm text-primary truncate tracking-tight">VektorMind AI</h1>
+<span class="font-label-mono-sm text-label-mono-sm px-1.5 py-0.5 rounded bg-surface-variant text-on-surface-variant uppercase tracking-wider">v4.8-SYNC</span>
+</div>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container shadow-[0_0_6px_#22ef7e]"></span>
+<p class="font-label-mono-sm text-label-mono-sm text-tertiary-fixed-dim uppercase tracking-wider truncate">ACTIVE • READY FOR DIRECTIVES</p>
+</div>
+</div>
+</div>
+<!-- Terminal Mode Switch Trigger -->
+<button aria-label="Toggle terminal mode" class="relative shrink-0 flex items-center justify-center h-10 px-space-sm gap-1.5 rounded-lg bg-surface-container text-primary-container shadow-[0_2px_12px_rgba(0,0,0,0.4)] active:scale-95 transition-all" id="terminalModeToggle" type="button">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider font-semibold">TTY</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_6px_#00e5ff]" id="ttyStatusLed"></span>
+</button>
+</div>
+<!-- Telemetry Sub-Band -->
+<div class="mt-space-sm pt-space-xs flex items-center justify-between font-label-mono-sm text-label-mono-sm text-outline">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[14px] text-primary-fixed-dim">memory</span>
+<span id="chat-latency">LATENCY: …</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[14px] text-tertiary-container">hub</span>
+<span id="chat-swarm">SWARM: …</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[14px] text-secondary">encrypted</span>
+<span id="chat-api">API: …</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Chat Stream Area -->
+<section class="relative z-10 px-margin flex flex-col gap-space-md py-space-xs flex-grow" id="messageStream">
+<!-- Stream Boundary Marker -->
+<div class="flex items-center justify-center gap-space-sm py-1">
+<div class="h-[1px] flex-1 bg-surface-variant"></div>
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-container-lowest" id="chat-log-date">MISSION CHAT LOG</span>
+<div class="h-[1px] flex-1 bg-surface-variant"></div>
+</div>
+<!-- Live backend status line (real) -->
+<div class="flex justify-center" id="chat-status-line">
+<span class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-container-lowest">CONNECTING…</span>
+</div>
+<!-- Live Computing / Typing Indicator -->
+<div class="flex items-start gap-space-sm max-w-[85%] self-start hidden" id="typingBlock">
+<div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 opacity-80 shadow-[0_0_8px_rgba(0,229,255,0.2)] bg-surface-container-lowest">
+<img alt="VektorMind Avatar" class="w-full h-full object-cover" src="../assets/vektormind-avatar.png"/>
+</div>
+<div class="bg-surface-container-low/90 backdrop-blur-md rounded-2xl rounded-tl-sm px-space-md py-space-sm shadow-[0_6px_20px_rgba(0,0,0,0.35)] flex items-center gap-space-sm">
+<div class="flex items-center gap-1">
+<span class="h-2 w-2 rounded-full bg-primary-container animate-bounce [animation-delay:-0.3s] shadow-[0_0_6px_#00e5ff]"></span>
+<span class="h-2 w-2 rounded-full bg-primary-container animate-bounce [animation-delay:-0.15s] shadow-[0_0_6px_#00e5ff]"></span>
+<span class="h-2 w-2 rounded-full bg-primary-container animate-bounce shadow-[0_0_6px_#00e5ff]"></span>
+</div>
+<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed tracking-wide">VektorMind is computing neural weights...</span>
+</div>
+</div>
+</section>
+<!-- Control & Input Dock -->
+<div class="relative z-20 mt-space-sm px-margin flex flex-col gap-space-sm">
+<!-- Quick-Suggestion Directive Chips (Horizontal Scrollable Strip) -->
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar py-0.5 -mx-margin px-margin">
+<button class="directive-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 transition-all shadow-sm" data-chip="📊 Status report" type="button">
+<span>📊</span>
+<span>Status report</span>
+</button>
+<button class="directive-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 transition-all shadow-sm" data-chip="🔍 Run Scout research" type="button">
+<span>🔍</span>
+<span>Run Scout research</span>
+</button>
+<button class="directive-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 transition-all shadow-sm" data-chip="🛡️ Security sweep" type="button">
+<span>🛡️</span>
+<span>Security sweep</span>
+</button>
+<button class="directive-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 transition-all shadow-sm" data-chip="💰 Check pricing" type="button">
+<span>💰</span>
+<span>Check pricing</span>
+</button>
+<button class="directive-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 transition-all shadow-sm" data-chip="⚡ Emergency override" type="button">
+<span>⚡</span>
+<span>Emergency override</span>
+</button>
+</div>
+<!-- Cybernetic Terminal Input Bar -->
+<div class="bg-surface-container-lowest/95 backdrop-blur-2xl rounded-2xl p-space-xs shadow-[0_12px_40px_rgba(0,0,0,0.85)]">
+<form class="flex items-center gap-space-xs" id="directiveForm">
+<!-- Attachment / Code Snippet Button -->
+<button aria-label="Upload payload" class="w-10 h-10 rounded-xl flex items-center justify-center text-outline hover:text-primary-container bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all shrink-0" id="snippetBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">code</span>
+</button>
+<!-- Voice Command Button -->
+<button aria-label="Audio directive" class="w-10 h-10 rounded-xl flex items-center justify-center text-outline hover:text-primary-container bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all shrink-0" id="voiceBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+<!-- Terminal Input Box -->
+<div class="relative flex-1 min-w-0">
+<input autocomplete="off" class="w-full h-11 bg-surface-container-low rounded-xl px-space-sm text-primary font-body-md text-body-md placeholder:text-outline/70 focus:outline-none focus:bg-surface-container transition-all" id="directiveInput" placeholder="Transmit directive to VektorMind..." type="text"/>
+<div class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-surface-variant font-label-mono-sm text-label-mono-sm text-primary-fixed" id="cmdIndicator">RAW</div>
+</div>
+<!-- Neon Tactical Transmission Trigger -->
+<button aria-label="Send Directive" class="h-11 px-space-md rounded-xl bg-primary-container text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-1.5 shadow-[0_0_18px_rgba(0,229,255,0.45)] hover:brightness-110 active:scale-95 transition-all shrink-0 font-bold" id="sendDirectiveBtn" type="submit">
+<span class="material-symbols-outlined text-[20px] font-bold">send</span>
+</button>
+</form>
+</div>
+<!-- Hardware / Subsystem Status Bar -->
+<div class="flex items-center justify-between px-space-xs font-label-mono-sm text-label-mono-sm text-outline">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+<span>AUDIO LINK: STANDBY</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span>ENCRYPTED NEURAL PIPELINE</span>
+<span class="material-symbols-outlined text-[12px] text-primary-container">lock</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const form = document.getElementById('directiveForm');
+    const input = document.getElementById('directiveInput');
+    const stream = document.getElementById('messageStream');
+    const typingBlock = document.getElementById('typingBlock');
+    const ttyToggle = document.getElementById('terminalModeToggle');
+    const ttyLed = document.getElementById('ttyStatusLed');
+    const cmdIndicator = document.getElementById('cmdIndicator');
+    const chips = document.querySelectorAll('.directive-chip');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const snippetBtn = document.getElementById('snippetBtn');
+
+    let isTerminalMode = false;
+    let isListening = false;
+
+    // Toggle TTY / Terminal Mode styling
+    ttyToggle?.addEventListener('click', () => {
+      isTerminalMode = !isTerminalMode;
+      if (isTerminalMode) {
+        input.classList.remove('font-body-md');
+        input.classList.add('font-label-mono-md', 'text-label-mono-md');
+        input.placeholder = "COMMAND://> root@vektormind --exec";
+        ttyLed.classList.replace('bg-primary-container', 'bg-tertiary-container');
+        cmdIndicator.classList.remove('hidden');
+      } else {
+        input.classList.remove('font-label-mono-md', 'text-label-mono-md');
+        input.classList.add('font-body-md');
+        input.placeholder = "Transmit directive to VektorMind...";
+        ttyLed.classList.replace('bg-tertiary-container', 'bg-primary-container');
+        cmdIndicator.classList.add('hidden');
+      }
+    });
+
+    // Handle Quick Directive Chips
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const text = chip.getAttribute('data-chip');
+        if (text && input) {
+          input.value = text.replace(/^[^\w\s]+\s*/, ''); // strip leading emoji
+          input.focus();
+        }
+      });
+    });
+
+    // Voice Command Micro-interaction
+    voiceBtn?.addEventListener('click', () => {
+      isListening = !isListening;
+      if (isListening) {
+        voiceBtn.classList.add('text-error', 'bg-error-container/30', 'animate-pulse');
+        input.placeholder = "Listening for vocal telemetry...";
+      } else {
+        voiceBtn.classList.remove('text-error', 'bg-error-container/30', 'animate-pulse');
+        input.placeholder = isTerminalMode ? "COMMAND://> root@vektormind --exec" : "Transmit directive to VektorMind...";
+      }
+    });
+
+    // Code Snippet Injection Micro-interaction
+    snippetBtn?.addEventListener('click', () => {
+      input.value = "SWARM::EXECUTE(\"PAYLOAD_HASH_8F1\");";
+      input.focus();
+    });
+
+    // Backend presence check (real)
+    (function checkBackend() {
+      var V = window.VF;
+      var t0 = performance.now();
+      V.vfGet('/api/agents').then(function (d) {
+        var n = (d.agents || []).length;
+        var lat = document.getElementById('chat-latency');
+        if (lat) lat.textContent = 'LATENCY: ' + Math.round(performance.now() - t0) + 'ms';
+        var sw = document.getElementById('chat-swarm');
+        if (sw) sw.textContent = 'AGENTS: ' + n + ' REGISTERED';
+        var line = document.getElementById('chat-status-line');
+        if (line) line.innerHTML = '<span class="font-label-mono-sm text-label-mono-sm text-tertiary uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-container-lowest">BACKEND LINKED \u2022 VEKTORMIND READY</span>';
+      }).catch(function (e) {
+        var line = document.getElementById('chat-status-line');
+        if (line) line.innerHTML = '<span class="font-label-mono-sm text-label-mono-sm text-error uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-container-lowest">BACKEND UNREACHABLE</span>';
+      });
+      V.vfGet('/api/info').then(function (info) {
+        var el = document.getElementById('chat-api');
+        if (el) el.textContent = 'API v' + (info.version || '?');
+      }).catch(function () {});
+      var dl = document.getElementById('chat-log-date');
+      if (dl) dl.textContent = 'MISSION CHAT LOG \u2022 ' + new Date().toISOString().slice(0, 10);
+    })();
+
+    // Handle Transmission & Reactive Agent Reply Simulation
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = input.value.trim();
+      if (!val) return;
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Create User Message Element
+      const userBubble = document.createElement('div');
+      userBubble.className = "flex items-start gap-space-sm max-w-[88%] self-end flex-row-reverse animate-in fade-in slide-in-from-bottom-2 duration-300";
+      userBubble.innerHTML = `
+        <div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 shadow-[0_0_12px_rgba(0,101,246,0.35)] bg-surface-container">
+          <div class="w-full h-full flex items-center justify-center bg-secondary-container text-on-secondary-container">
+            <span class="material-symbols-outlined text-[18px]">account_circle</span>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-1 min-w-0">
+          <div class="bg-secondary-container/20 backdrop-blur-md rounded-2xl rounded-tr-sm p-space-md shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+            <div class="flex items-center justify-between gap-space-sm mb-1">
+              <span class="font-label-mono-sm text-label-mono-sm text-outline">${time}</span>
+              <span class="font-headline-sm text-[13px] text-secondary tracking-wide uppercase">COMMANDER</span>
+            </div>
+            <p class="font-body-md text-body-md text-primary font-medium leading-relaxed">${escapeHtml(val)}</p>
+          </div>
+          <span class="font-label-mono-sm text-label-mono-sm text-tertiary-container flex items-center gap-1 pr-1">
+            <span class="material-symbols-outlined text-[12px]">done_all</span> TRANSMITTED
+          </span>
+        </div>
+      `;
+
+      // Insert User Message before typing block
+      stream.insertBefore(userBubble, typingBlock);
+      input.value = '';
+
+      // Scroll into view
+      userBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Show typing indicator prominently
+      typingBlock.classList.remove('hidden');
+
+      // Real backend response -> POST /api/ai/chat
+      window.VF.vfPost('/api/ai/chat', { message: val }, { timeout: 90000 }).then((d) => {
+        typingBlock.classList.add('hidden');
+        const raw = (d && typeof d.response === 'string') ? d.response : '';
+        const isFallback = raw.trim() === "I'm here to help.";
+        const now2 = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const bubble = document.createElement('div');
+        bubble.className = "flex items-start gap-space-sm max-w-[88%] self-start";
+        bubble.innerHTML = `
+          <div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 shadow-[0_0_12px_rgba(0,229,255,0.3)] bg-surface-container-lowest">
+            <img src="../assets/vektormind-avatar.png" alt="VektorMind Avatar" class="w-full h-full object-cover">
+          </div>
+          <div class="flex flex-col gap-1 min-w-0">
+            <div class="bg-surface-container-low/95 backdrop-blur-md rounded-2xl rounded-tl-sm p-space-md shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
+              <div class="flex items-center justify-between gap-space-sm mb-1.5 pb-1">
+                <span class="font-headline-sm text-[13px] text-primary tracking-wide">VEKTORMIND</span>
+                <span class="font-label-mono-sm text-label-mono-sm text-outline">${now2}</span>
+              </div>
+              <p class="font-body-md text-body-md text-on-surface leading-relaxed" style="white-space: pre-wrap;">${raw ? escapeHtml(raw) : '<span class="text-outline">Empty response from backend.</span>'}</p>
+              ${isFallback ? `<div class="mt-2.5 pt-2 flex items-center gap-space-sm"><span class="font-label-mono-sm text-label-mono-sm px-1.5 py-0.5 rounded bg-[#ffb300]/15 text-[#ffb300]">LLM OFFLINE — BACKEND RETURNED ITS FALLBACK. CHECK THE API KEY.</span></div>` : ''}
+            </div>
+          </div>
+        `;
+        stream.insertBefore(bubble, typingBlock);
+        bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (!isFallback && window.VfVoice) window.VfVoice.speak(raw);
+      }).catch((err) => {
+        typingBlock.classList.add('hidden');
+        const bubble = document.createElement('div');
+        bubble.className = "flex items-start gap-space-sm max-w-[88%] self-start";
+        bubble.innerHTML = `
+          <div class="flex flex-col gap-1 min-w-0">
+            <div class="bg-error-container/20 backdrop-blur-md rounded-2xl rounded-tl-sm p-space-md">
+              <p class="font-body-md text-body-md text-error leading-relaxed">Request failed: ${escapeHtml(err.message)}</p>
+            </div>
+          </div>
+        `;
+        stream.insertBefore(bubble, typingBlock);
+        bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    // TTS readout toggle (VfVoice)
+    (function initTts() {
+      var btn = document.getElementById('ttsToggle');
+      var icon = document.getElementById('ttsToggleIcon');
+      if (!btn || !window.VfVoice) return;
+      if (!window.VfVoice.isSupported()) { btn.style.display = 'none'; return; }
+      function paint() {
+        var on = window.VfVoice.isEnabled();
+        if (icon) icon.textContent = on ? 'volume_up' : 'volume_off';
+        btn.classList.toggle('text-primary-container', on);
+        btn.classList.toggle('text-outline', !on);
+      }
+      btn.addEventListener('click', function () {
+        window.VfVoice.setEnabled(!window.VfVoice.isEnabled());
+        paint();
+      });
+      window.addEventListener('pagehide', function () { window.VfVoice.stop(); });
+      paint();
+    })();
+
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.7)]" data-active-classes="text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]"><div class="h-16 px-space-sm flex items-center justify-around"><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Home</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="agents" href="agents.html"><span class="material-symbols-outlined text-[24px]">hub</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Agents</span></a><a aria-current="page" class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 transition-all text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]" data-path="chat" href="chat.html"><span class="material-symbols-outlined text-[24px]">terminal</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Chat</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="missions" href="missions.html"><span class="material-symbols-outlined text-[24px]">save_as</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Missions</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="hermes" href="hermes.html"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Hermes</span></a></div></nav></body></html>
