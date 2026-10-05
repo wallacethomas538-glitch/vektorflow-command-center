@@ -117,7 +117,7 @@
       if (!goal) { out.innerHTML = '<span class="text-error">Describe the mission goal first.</span>'; return; }
       btn.disabled = true; btn.textContent = 'DISPATCHING…';
       out.innerHTML = '<span class="text-primary-container">Dispatching agent team…</span>';
-      V.vfPost('/api/agents/run', { goal: goal, email: 'commander@vektorflow.com' }, { timeout: 180000 }).then(function (d) {
+      V.vfPost('/api/agents/run?wait=true', { goal: goal, email: 'commander@vektorflow.com' }, { timeout: 180000 }).then(function (d) {
         btn.disabled = false; btn.textContent = 'DISPATCH';
         out.innerHTML = '<span class="text-tertiary">Mission dispatched.</span>'
           + '<pre class="mt-2 p-2 rounded bg-surface-container-lowest text-on-surface-variant overflow-x-auto" style="white-space: pre-wrap;">' + V.vfEscapeHtml(V.vfResultText(d)).slice(0, 2000) + '</pre>';
