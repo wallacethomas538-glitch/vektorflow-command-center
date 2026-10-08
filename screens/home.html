@@ -40,13 +40,13 @@
 <h2 class="font-headline-md text-headline-md text-primary tracking-tight truncate">VektorMind</h2>
 <div class="flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded-full shrink-0">
 <span class="material-symbols-outlined text-[12px] text-primary-container">verified</span>
-<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed uppercase tracking-wider">LVL 5 AGI</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed uppercase tracking-wider" id="hero-agent-badge">…</span>
 </div>
 </div>
 <p class="font-label-mono-sm text-label-mono-sm text-on-surface-variant uppercase tracking-widest mt-0.5 truncate">CORE SWARM ORCHESTRATOR</p>
 <div class="inline-flex items-center gap-1.5 self-start mt-2 px-2 py-0.5 rounded bg-surface-container-highest">
 <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-ping"></span>
-<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed-dim uppercase tracking-wider">ACTIVE • AUTONOMOUS</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed-dim uppercase tracking-wider" id="hero-status-pill">CHECKING…</span>
 </div>
 </div>
 </div>
@@ -179,7 +179,7 @@
 <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse"></span>
         Live Task Feed
       </span>
-<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed-dim">/api/tasks</span>
+<span class="flex items-center gap-2"><span class="font-label-mono-sm text-label-mono-sm text-primary-fixed-dim">/api/v1/mission-control</span><button onclick="refreshHome()" aria-label="Refresh dashboard" type="button" class="flex items-center justify-center w-7 h-7 rounded-full bg-surface-container-low text-primary-container active:scale-95 transition-all"><span class="material-symbols-outlined text-[16px]">refresh</span></button></span>
 </div>
 <div class="bg-surface-container-low rounded-xl p-space-md shadow-md space-y-space-xs font-label-mono-sm text-label-mono-sm" id="task-feed">
 <div class="text-outline">Loading tasks…</div>
@@ -189,66 +189,95 @@
 <script>
 (function initHome() {
   var V = window.VF;
+  var MC = '/api/v1/mission-control';
+  var MC_ACTIVE = ['planning','ready','awaiting_approval','approved','executing','paused','blocked'];
+
   function setText(id, t) { var el = document.getElementById(id); if (el) el.textContent = t; }
   function showError(containerId, err) {
     var el = document.getElementById(containerId);
-    if (el) el.innerHTML = '<div class="text-error">Couldn\'t reach backend — <button class="underline text-primary-container" onclick="location.reload()">retry</button><div class="text-outline mt-1">' + V.vfEscapeHtml(err.message) + '</div></div>';
+    if (el) el.innerHTML = '<div class="text-error">Couldn\'t reach backend — <button class="underline text-primary-container" onclick="refreshHome()">retry</button><div class="text-outline mt-1">' + V.vfEscapeHtml(err.message) + '</div></div>';
   }
-  // Backend health (measured round-trip)
-  var t0 = performance.now();
-  V.vfGet("/health").then(function (h) {
-    var ms = Math.round(performance.now() - t0);
-    var ok = h && (h.status === "healthy" || h.status === "awake");
-    setText("backend-status-text", ok ? "ONLINE" : String((h && h.status) || "UNKNOWN").toUpperCase());
-    setText("ribbon-status-text", ok ? "SYSTEM ONLINE" : "SYSTEM OFFLINE");
-    setText("backend-link-val", ok ? "CONNECTED \u2022 " + ms + "ms" : "UNREACHABLE");
-    return V.vfGet("/api/info").then(function (info) {
-      setText("backend-link-ver", "v" + (info.version || "?") + " \u2022 " + (info.agent_count || "?") + " agents");
-      setText("hero-backend-ver", "BACKEND v" + (info.version || "?"));
-    }).catch(function () {});
-  }).catch(function (e) {
-    setText("backend-status-text", "OFFLINE");
-    setText("ribbon-status-text", "SYSTEM OFFLINE");
-    setText("backend-link-val", "UNREACHABLE");
-    showError("task-feed", e);
-  });
-  // Agents
-  V.vfGet("/api/agents").then(function (d) {
-    var n = d.count || (d.agents || []).length;
-    setText("stat-agents", n + "/" + n);
-    setText("stat-agents-sub", "AGENTS REGISTERED");
-  }).catch(function () { setText("stat-agents", "\u2014"); setText("stat-agents-sub", "UNREACHABLE"); });
-  // Tasks
-  V.vfGet("/api/tasks").then(function (d) {
-    var tasks = d.tasks || [];
-    var done = tasks.filter(function (t) { return t.status === "completed"; }).length;
-    var open = tasks.length - done;
-    setText("stat-tasks-done", String(done));
-    setText("stat-tasks-sub", open + " OPEN");
-    var first = tasks.filter(function (t) { return t.status !== "completed"; })[0] || tasks[0];
-    if (first) setText("hero-directive", "Active directive: " + first.title + " [" + first.status + "]");
-    var feed = document.getElementById("task-feed");
-    if (feed) {
-      feed.innerHTML = tasks.map(function (t) {
-        var badge = t.status === "completed"
-          ? '<span class="text-tertiary shrink-0">DONE</span>'
-          : t.status === "in_progress"
-          ? '<span class="text-primary-container shrink-0">ACTIVE</span>'
-          : '<span class="text-[#ffb300] shrink-0">QUEUED</span>';
-        return '<div class="flex items-start justify-between gap-space-sm text-on-surface-variant">'
-          + '<div class="flex items-center gap-2 min-w-0"><span class="text-outline shrink-0">#' + V.vfEscapeHtml(String(t.id)) + '</span>'
-          + '<span class="truncate text-on-surface">' + V.vfEscapeHtml(t.title) + '</span></div>' + badge + '</div>';
-      }).join("") || '<div class="text-outline">No tasks on the backend.</div>';
-    }
-  }).catch(function (e) { setText("stat-tasks-done", "\u2014"); showError("task-feed", e); });
-  // Shopify
-  V.vfGet("/api/shopify/products?limit=1").then(function (d) {
-    setText("stat-products", String(d.count || 0));
-    setText("stat-products-sub", "LIVE CATALOG");
-  }).catch(function () { setText("stat-products", "\u2014"); setText("stat-products-sub", "NOT CONNECTED"); });
-  V.vfGet("/api/shopify/orders?limit=1").then(function (d) {
-    setText("stat-orders", String(d.count || 0));
-    setText("stat-orders-sub", "TOTAL ORDERS");
-  }).catch(function () { setText("stat-orders", "\u2014"); setText("stat-orders-sub", "NOT CONNECTED"); });
+  function stateLabel(s) {
+    var map = {draft:'QUEUED', planning:'PLANNING', ready:'READY', awaiting_approval:'AWAITING APPROVAL', approved:'APPROVED', executing:'EXECUTING', paused:'PAUSED', blocked:'BLOCKED', completed:'DONE', failed:'FAILED', cancelled:'CANCELLED'};
+    return map[s] || String(s).toUpperCase();
+  }
+  function stateColor(s) {
+    if (s === 'completed') return 'text-tertiary';
+    if (s === 'failed' || s === 'blocked') return 'text-error';
+    if (s === 'executing') return 'text-primary-container';
+    return 'text-[#ffb300]';
+  }
+
+  function loadHealth() {
+    var t0 = performance.now();
+    V.vfGet("/health").then(function (h) {
+      var ms = Math.round(performance.now() - t0);
+      var ok = h && (h.status === "healthy" || h.status === "awake");
+      setText("backend-status-text", ok ? "ONLINE" : String((h && h.status) || "UNKNOWN").toUpperCase());
+      setText("ribbon-status-text", ok ? "SYSTEM ONLINE" : "SYSTEM OFFLINE");
+      setText("backend-link-val", ok ? "CONNECTED \u2022 " + ms + "ms" : "UNREACHABLE");
+      setText("hero-status-pill", ok ? "BACKEND ONLINE" : "BACKEND OFFLINE");
+      return V.vfGet("/api/info").then(function (info) {
+        setText("backend-link-ver", "v" + (info.version || "?") + " \u2022 " + (info.agent_count || "?") + " agents");
+        setText("hero-backend-ver", "BACKEND v" + (info.version || "?"));
+        setText("hero-agent-badge", (info.agent_count || "?") + " AGENTS");
+      }).catch(function () {});
+    }).catch(function (e) {
+      setText("backend-status-text", "OFFLINE");
+      setText("ribbon-status-text", "SYSTEM OFFLINE");
+      setText("backend-link-val", "UNREACHABLE");
+      setText("hero-status-pill", "BACKEND OFFLINE");
+      showError("task-feed", e);
+    });
+  }
+
+  function loadAgents() {
+    V.vfGet("/api/agents").then(function (d) {
+      var n = d.count || (d.agents || []).length;
+      setText("stat-agents", n + "/" + n);
+      setText("stat-agents-sub", "AGENTS REGISTERED");
+    }).catch(function () { setText("stat-agents", "\u2014"); setText("stat-agents-sub", "UNREACHABLE"); });
+  }
+
+  function loadMissions() {
+    V.vfGet(MC + "/missions?limit=100").then(function (d) {
+      var missions = d.missions || [];
+      var done = missions.filter(function (m) { return m.state === "completed"; }).length;
+      var failed = missions.filter(function (m) { return m.state === "failed"; }).length;
+      var open = missions.filter(function (m) { return MC_ACTIVE.indexOf(m.state) !== -1; }).length;
+      setText("stat-tasks-done", String(done));
+      setText("stat-tasks-sub", open + " OPEN" + (failed ? " \u2022 " + failed + " FAILED" : ""));
+      var first = missions.filter(function (m) { return MC_ACTIVE.indexOf(m.state) !== -1; })[0] || missions[0];
+      if (first) setText("hero-directive", "Active directive: " + first.objective + " [" + stateLabel(first.state) + "]");
+      else setText("hero-directive", "No missions yet — open Missions to dispatch the agent team.");
+      var feed = document.getElementById("task-feed");
+      if (feed) {
+        feed.innerHTML = missions.slice(0, 5).map(function (m) {
+          return '<div class="flex items-start justify-between gap-space-sm text-on-surface-variant">'
+            + '<div class="flex items-center gap-2 min-w-0"><span class="text-outline shrink-0">#' + V.vfEscapeHtml(String(m.id).slice(0, 8)) + '</span>'
+            + '<span class="truncate text-on-surface">' + V.vfEscapeHtml(m.objective || '(no objective)') + '</span></div>'
+            + '<span class="' + stateColor(m.state) + ' shrink-0">' + stateLabel(m.state) + '</span></div>';
+        }).join("") || '<div class="text-outline">No missions on the backend.</div>';
+      }
+    }).catch(function (e) { setText("stat-tasks-done", "\u2014"); showError("task-feed", e); });
+  }
+
+  function loadShopify() {
+    V.vfGet("/api/shopify/products?limit=1").then(function (d) {
+      setText("stat-products", String(d.total != null ? d.total : d.count));
+      setText("stat-products-sub", "LIVE CATALOG");
+    }).catch(function () { setText("stat-products", "\u2014"); setText("stat-products-sub", "NOT CONNECTED"); });
+    V.vfGet("/api/shopify/orders?limit=1").then(function (d) {
+      setText("stat-orders", String(d.total != null ? d.total : d.count));
+      setText("stat-orders-sub", "TOTAL ORDERS");
+    }).catch(function () { setText("stat-orders", "\u2014"); setText("stat-orders-sub", "NOT CONNECTED"); });
+  }
+
+  window.refreshHome = function () {
+    loadHealth(); loadAgents(); loadMissions(); loadShopify();
+  };
+  refreshHome();
+  setInterval(function () { if (!document.hidden) refreshHome(); }, 60000);
 })();
-</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.7)]" data-active-classes="text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]"><div class="h-16 px-space-sm flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 transition-all text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Home</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="agents" href="agents.html"><span class="material-symbols-outlined text-[24px]">hub</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Agents</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="chat" href="chat.html"><span class="material-symbols-outlined text-[24px]">terminal</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Chat</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="missions" href="missions.html"><span class="material-symbols-outlined text-[24px]">save_as</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Missions</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="hermes" href="hermes.html"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Hermes</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="inventory" href="inventory.html"><span class="material-symbols-outlined text-[24px]">inventory_2</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Stock</span></a></div></nav></body></html>
+</script>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.7)]" data-active-classes="text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]"><div class="h-16 px-space-sm flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 transition-all text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Home</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="agents" href="agents.html"><span class="material-symbols-outlined text-[24px]">hub</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Agents</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="chat" href="chat.html"><span class="material-symbols-outlined text-[24px]">terminal</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Chat</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="missions" href="missions.html"><span class="material-symbols-outlined text-[24px]">save_as</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Missions</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="hermes" href="hermes.html"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Hermes</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="inventory" href="inventory.html"><span class="material-symbols-outlined text-[24px]">inventory_2</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Stock</span></a></div></nav></body></html>
