@@ -16,6 +16,7 @@
 </div>
 <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight uppercase">MISSION DIRECTIVES</h2>
 </div>
+<button onclick="loadMissions()" aria-label="Refresh missions" type="button" class="flex items-center justify-center w-9 h-9 rounded-full bg-surface-container-low text-primary-container shadow-md active:scale-95 transition-all"><span class="material-symbols-outlined text-[20px]">refresh</span></button>
 <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high shadow-inner">
 <div class="h-2 w-2 rounded-full bg-primary-container shadow-[0_0_8px_#00e5ff] animate-ping"></div>
 <span class="font-label-mono-sm text-label-mono-sm text-primary font-semibold tracking-wider" id="ops-pill">LOADING…</span>
@@ -51,7 +52,7 @@
 <span class="px-1.5 py-0.2 rounded-full bg-surface-container text-outline text-[10px] font-mono" id="filter-count-done">–</span>
 </button>
 </div>
-<!-- Mission Cards Stack (real backend data from /api/tasks) -->
+<!-- Mission Cards Stack (live data from /api/v1/mission-control) -->
 <div class="flex flex-col space-y-space-md" id="missionsList">
 <div class="font-label-mono-sm text-label-mono-sm text-outline p-space-md">Loading missions…</div>
 </div>
@@ -70,7 +71,7 @@
 <button class="flex-1 h-11 rounded-xl bg-surface-container text-on-surface font-label-mono-md text-label-mono-md tracking-wider" onclick="closeMissionModal()" type="button">CANCEL</button>
 <button class="flex-1 h-11 rounded-xl bg-primary-container text-on-primary font-headline-sm text-headline-sm font-bold shadow-[0_0_16px_rgba(0,229,255,0.4)] active:scale-95 transition-all" id="mission-dispatch-btn" onclick="dispatchMission()" type="button">DISPATCH</button>
 </div>
-<p class="font-label-mono-sm text-label-mono-sm text-outline">Dispatches the agent team via POST /api/agents/run. This can take a minute or more.</p>
+<p class="font-label-mono-sm text-label-mono-sm text-outline">Creates a mission, plans it across the 15-agent team, then executes it. Watch progress live below.</p>
 </div>
 </div>
 <!-- Tactical Floating Action Button (FAB) -->
@@ -85,8 +86,28 @@
 </button>
 </div>
 </div>
-<!-- Mission Wiring (real backend data) -->
+<!-- Mission Wiring (mission-control engine: create -> plan -> execute, live) -->
 <script>
+    var MC = '/api/v1/mission-control';
+    var MC_ACTIVE = ['planning','ready','awaiting_approval','approved','executing','paused','blocked'];
+
+    function stateMeta(st) {
+      var map = {
+        draft:             { key:'queued',    label:'QUEUED',     edge:'bg-[#849396]', pill:'bg-[#849396]/10', dot:'text-outline' },
+        planning:          { key:'queued',    label:'PLANNING',   edge:'bg-[#ffb300] shadow-[0_0_12px_rgba(255,179,0,0.8)]', pill:'bg-[#ffb300]/10', dot:'text-[#ffb300]' },
+        ready:             { key:'active',    label:'READY',      edge:'bg-primary-container shadow-[0_0_12px_#00e5ff]', pill:'bg-primary-container/10', dot:'text-primary-container' },
+        awaiting_approval: { key:'active',    label:'AWAITING APPROVAL', edge:'bg-[#ff8a00] shadow-[0_0_12px_rgba(255,138,0,0.8)]', pill:'bg-[#ff8a00]/10', dot:'text-[#ff8a00]' },
+        approved:          { key:'active',    label:'APPROVED',   edge:'bg-secondary shadow-[0_0_12px_#b2c5ff]', pill:'bg-secondary/10', dot:'text-secondary' },
+        executing:         { key:'active',    label:'EXECUTING',  edge:'bg-primary-container shadow-[0_0_12px_#00e5ff]', pill:'bg-primary-container/10', dot:'text-primary-container' },
+        paused:            { key:'active',    label:'PAUSED',     edge:'bg-[#849396]', pill:'bg-[#849396]/10', dot:'text-outline' },
+        blocked:           { key:'active',    label:'BLOCKED',    edge:'bg-error shadow-[0_0_12px_#ffb4ab]', pill:'bg-error/10', dot:'text-error' },
+        completed:         { key:'completed', label:'COMPLETED',  edge:'bg-tertiary-container shadow-[0_0_12px_#22ef7e]', pill:'bg-tertiary-container/10', dot:'text-tertiary-container' },
+        failed:            { key:'completed', label:'FAILED',     edge:'bg-error-container shadow-[0_0_12px_#93000a]', pill:'bg-error-container/10', dot:'text-error' },
+        cancelled:         { key:'completed', label:'CANCELLED',  edge:'bg-[#849396]', pill:'bg-[#849396]/10', dot:'text-outline' }
+      };
+      return map[st] || map['draft'];
+    }
+
     function setFilter(type, btn) {
       document.querySelectorAll('.filter-tab').forEach(function (el) {
         el.className = 'filter-tab flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1 text-on-surface-variant hover:text-on-surface transition-all';
@@ -109,69 +130,139 @@
       var m = document.getElementById('mission-modal');
       m.classList.add('hidden'); m.classList.remove('flex');
     }
+
+    function fmtTime(iso) {
+      try { return new Date(iso).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}); }
+      catch (e) { return iso || ''; }
+    }
+    function setCount(id, n) { var el = document.getElementById(id); if (el) el.textContent = String(n); }
+
+    function missionCard(m) {
+      var V = window.VF;
+      var meta = stateMeta(m.state);
+      var mid = V.vfEscapeHtml(m.id);
+      return '<div class="relative rounded-2xl bg-surface-container/70 backdrop-blur-md p-space-md shadow-[0_8px_32px_0_rgba(0,0,0,0.45)] overflow-hidden cursor-pointer" data-status="' + meta.key + '" onclick="toggleMissionDetail(\'' + mid + '\')">'
+        + '<div class="absolute left-0 top-0 bottom-0 w-1.5 ' + meta.edge + '"></div>'
+        + '<div class="flex flex-col pl-2 space-y-space-sm">'
+        + '<div class="flex items-center justify-between gap-space-sm">'
+        + '<span class="font-label-mono-md text-label-mono-md text-on-surface font-semibold tracking-wider">MISSION #' + V.vfEscapeHtml(String(m.id).slice(0, 12)) + '</span>'
+        + '<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full ' + meta.pill + '">'
+        + '<div class="w-1.5 h-1.5 rounded-full bg-current ' + meta.dot + ' animate-pulse"></div>'
+        + '<span class="font-label-mono-sm text-label-mono-sm ' + meta.dot + ' font-bold tracking-widest">' + meta.label + '</span>'
+        + '</div></div>'
+        + '<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">' + V.vfEscapeHtml(m.objective || '(no objective)') + '</h3>'
+        + '<div class="font-label-mono-sm text-label-mono-sm text-outline">' + fmtTime(m.created_at) + ' &bull; tap for tasks &amp; timeline</div>'
+        + '<div class="mission-detail hidden" id="detail-' + mid + '"></div>'
+        + '</div></div>';
+    }
+
+    function loadMissions() {
+      var V = window.VF;
+      V.vfGet(MC + '/missions?limit=50').then(function (d) {
+        var missions = d.missions || [];
+        var counts = { all: missions.length, active: 0, queued: 0, completed: 0 };
+        missions.forEach(function (m) {
+          var k = stateMeta(m.state).key;
+          if (counts[k] !== undefined) counts[k]++;
+        });
+        setCount('filter-count-all', counts.all);
+        setCount('filter-count-active', counts.active);
+        setCount('filter-count-queued', counts.queued);
+        setCount('filter-count-done', counts.completed);
+        var pill = document.getElementById('ops-pill');
+        if (pill) pill.textContent = (counts.active + counts.queued) + ' ACTIVE OPS';
+        var list = document.getElementById('missionsList');
+        if (list) {
+          list.innerHTML = missions.length
+            ? missions.map(missionCard).join("")
+            : '<div class="font-label-mono-sm text-label-mono-sm text-outline p-space-md">No missions yet &mdash; tap NEW MISSION to dispatch the agent team.</div>';
+        }
+      }).catch(function (e) {
+        var list = document.getElementById('missionsList');
+        if (list) list.innerHTML = '<div class="p-space-md text-error font-label-mono-sm text-label-mono-sm">Couldn\'t reach backend &mdash; <button class="underline text-primary-container" onclick="loadMissions()">retry</button><div class="text-outline mt-1">' + window.VF.vfEscapeHtml(e.message) + '</div></div>';
+        var pill = document.getElementById('ops-pill');
+        if (pill) pill.textContent = 'OFFLINE';
+      });
+    }
+
+    function toggleMissionDetail(mid) {
+      var V = window.VF;
+      var box = document.getElementById('detail-' + mid);
+      if (!box) return;
+      if (!box.classList.contains('hidden')) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+      box.classList.remove('hidden');
+      box.innerHTML = '<div class="text-outline font-label-mono-sm text-label-mono-sm">Loading detail&hellip;</div>';
+      V.vfGet(MC + '/missions/' + encodeURIComponent(mid)).then(function (d) {
+        var tasks = d.tasks || [];
+        var audit = d.audit || [];
+        var html = '';
+        if (tasks.length) {
+          html += '<div class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-widest mt-1 mb-1">Tasks (' + tasks.length + ')</div>';
+          html += tasks.map(function (t) {
+            return '<div class="flex items-start justify-between gap-2 py-1" style="border-top: 1px solid rgba(255,255,255,0.06);">'
+              + '<div class="min-w-0"><div class="font-label-mono-sm text-label-mono-sm text-primary-container">' + V.vfEscapeHtml(t.agent || '') + '</div>'
+              + '<div class="text-on-surface-variant" style="font-size:11px;">' + V.vfEscapeHtml(t.instruction || '') + '</div></div>'
+              + '<span class="font-label-mono-sm text-label-mono-sm text-outline shrink-0">' + V.vfEscapeHtml(t.status || '') + '</span></div>';
+          }).join('');
+        }
+        if (audit.length) {
+          html += '<div class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-widest mt-2 mb-1">Timeline</div>';
+          html += audit.slice(-8).map(function (a) {
+            var arrow = (a.from_state || a.to_state) ? V.vfEscapeHtml(a.from_state || '') + ' &rarr; ' + V.vfEscapeHtml(a.to_state || '') : V.vfEscapeHtml(a.event_type || '');
+            return '<div class="font-label-mono-sm text-label-mono-sm text-on-surface-variant py-0.5">' + fmtTime(a.created_at) + ' &mdash; ' + V.vfEscapeHtml(a.actor || '') + ': ' + arrow + '</div>';
+          }).join('');
+        }
+        box.innerHTML = html || '<div class="text-outline font-label-mono-sm text-label-mono-sm">No tasks or events yet.</div>';
+      }).catch(function (e) {
+        box.innerHTML = '<div class="text-error font-label-mono-sm text-label-mono-sm">' + V.vfEscapeHtml(e.message) + '</div>';
+      });
+    }
+
     function dispatchMission() {
       var V = window.VF;
       var goal = document.getElementById('mission-goal').value.trim();
       var out = document.getElementById('mission-result');
       var btn = document.getElementById('mission-dispatch-btn');
       if (!goal) { out.innerHTML = '<span class="text-error">Describe the mission goal first.</span>'; return; }
-      btn.disabled = true; btn.textContent = 'DISPATCHING…';
-      out.innerHTML = '<span class="text-primary-container">Dispatching agent team…</span>';
-      V.vfPost('/api/agents/run?wait=true', { goal: goal, email: 'commander@vektorflow.com' }, { timeout: 180000 }).then(function (d) {
+      btn.disabled = true; btn.textContent = 'LAUNCHING\u2026';
+      out.innerHTML = '<span class="text-primary-container">Creating mission&hellip;</span>';
+      var mid = null;
+      V.vfPost(MC + '/missions', { objective: goal }).then(function (d) {
+        mid = d.mission.id;
+        out.innerHTML = '<span class="text-primary-container">Planning across the 15-agent team&hellip;</span>';
+        return V.vfPost(MC + '/missions/' + encodeURIComponent(mid) + '/plan');
+      }).then(function () {
+        out.innerHTML = '<span class="text-primary-container">Executing&hellip;</span>';
+        return V.vfPost(MC + '/missions/' + encodeURIComponent(mid) + '/execute?wait=false');
+      }).then(function () {
         btn.disabled = false; btn.textContent = 'DISPATCH';
-        out.innerHTML = '<span class="text-tertiary">Mission dispatched.</span>'
-          + '<pre class="mt-2 p-2 rounded bg-surface-container-lowest text-on-surface-variant overflow-x-auto" style="white-space: pre-wrap;">' + V.vfEscapeHtml(V.vfResultText(d)).slice(0, 2000) + '</pre>';
+        out.innerHTML = '<span class="text-tertiary">Mission executing &mdash; watch it live below.</span>';
+        document.getElementById('mission-goal').value = '';
+        setTimeout(closeMissionModal, 1200);
         loadMissions();
+        pollMission(mid);
       }).catch(function (e) {
         btn.disabled = false; btn.textContent = 'DISPATCH';
         out.innerHTML = '<span class="text-error">' + V.vfEscapeHtml(e.message) + '</span>';
       });
     }
 
-    function statusMeta(st) {
-      if (st === 'completed') return { key: 'completed', label: 'COMPLETED', edge: 'bg-tertiary-container shadow-[0_0_12px_#22ef7e]', pill: 'bg-tertiary-container/10', dot: 'text-tertiary-container' };
-      if (st === 'in_progress') return { key: 'active', label: 'ACTIVE', edge: 'bg-primary-container shadow-[0_0_12px_#00e5ff]', pill: 'bg-primary-container/10', dot: 'text-primary-container' };
-      return { key: 'queued', label: 'QUEUED', edge: 'bg-[#ffb300] shadow-[0_0_12px_rgba(255,179,0,0.8)]', pill: 'bg-[#ffb300]/10', dot: 'text-[#ffb300]' };
+    var pollTimers = {};
+    function pollMission(mid) {
+      if (!mid || pollTimers[mid]) return;
+      pollTimers[mid] = setInterval(function () {
+        window.VF.vfGet(MC + '/missions/' + encodeURIComponent(mid)).then(function (d) {
+          var st = d.mission && d.mission.state;
+          loadMissions();
+          if (st === 'completed' || st === 'failed' || st === 'cancelled') {
+            clearInterval(pollTimers[mid]); delete pollTimers[mid];
+          }
+        }).catch(function () { /* backend may be waking; keep polling */ });
+      }, 8000);
     }
-    function setCount(id, n) { var el = document.getElementById(id); if (el) el.textContent = String(n); }
 
-    function loadMissions() {
-      var V = window.VF;
-      V.vfGet('/api/tasks').then(function (d) {
-        var tasks = d.tasks || [];
-        var active = tasks.filter(function (t) { return t.status === 'in_progress'; }).length;
-        var queued = tasks.filter(function (t) { return t.status === 'pending'; }).length;
-        var done = tasks.filter(function (t) { return t.status === 'completed'; }).length;
-        setCount('filter-count-all', tasks.length);
-        setCount('filter-count-active', active);
-        setCount('filter-count-queued', queued);
-        setCount('filter-count-done', done);
-        var pill = document.getElementById('ops-pill');
-        if (pill) pill.textContent = (active + queued) + ' ACTIVE OPS';
-        var list = document.getElementById('missionsList');
-        if (list) {
-          list.innerHTML = tasks.length ? tasks.map(function (t) {
-            var m = statusMeta(t.status);
-            return '<div class="relative rounded-2xl bg-surface-container/70 backdrop-blur-md p-space-md shadow-[0_8px_32px_0_rgba(0,0,0,0.45)] overflow-hidden" data-status="' + m.key + '">'
-              + '<div class="absolute left-0 top-0 bottom-0 w-1.5 ' + m.edge + '"></div>'
-              + '<div class="flex flex-col pl-2 space-y-space-sm">'
-              + '<div class="flex items-center justify-between gap-space-sm">'
-              + '<span class="font-label-mono-md text-label-mono-md text-on-surface font-semibold tracking-wider">TASK #' + V.vfEscapeHtml(String(t.id)) + '</span>'
-              + '<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full ' + m.pill + '">'
-              + '<div class="w-1.5 h-1.5 rounded-full bg-current ' + m.dot + ' animate-pulse"></div>'
-              + '<span class="font-label-mono-sm text-label-mono-sm ' + m.dot + ' font-bold tracking-widest">' + m.label + '</span>'
-              + '</div></div>'
-              + '<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">' + V.vfEscapeHtml(t.title) + '</h3>'
-              + '</div></div>';
-          }).join("") : '<div class="font-label-mono-sm text-label-mono-sm text-outline p-space-md">No missions on the backend.</div>';
-        }
-      }).catch(function (e) {
-        var list = document.getElementById('missionsList');
-        if (list) list.innerHTML = '<div class="p-space-md text-error font-label-mono-sm text-label-mono-sm">Couldn\'t reach backend — <button class="underline text-primary-container" onclick="location.reload()">retry</button><div class="text-outline mt-1">' + window.VF.vfEscapeHtml(e.message) + '</div></div>';
-        var pill = document.getElementById('ops-pill');
-        if (pill) pill.textContent = 'OFFLINE';
-      });
-    }
     loadMissions();
+    setInterval(function () { if (!document.hidden) loadMissions(); }, 30000);
   </script>
+
 </div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.7)]" data-active-classes="text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]"><div class="h-16 px-space-sm flex items-center justify-around"><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Home</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="agents" href="agents.html"><span class="material-symbols-outlined text-[24px]">hub</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Agents</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="chat" href="chat.html"><span class="material-symbols-outlined text-[24px]">terminal</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Chat</span></a><a aria-current="page" class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 transition-all text-primary-container drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]" data-path="missions" href="missions.html"><span class="material-symbols-outlined text-[24px]">save_as</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Missions</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="hermes" href="hermes.html"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Hermes</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-0.5 text-outline hover:text-on-surface transition-all" data-path="inventory" href="inventory.html"><span class="material-symbols-outlined text-[24px]">inventory_2</span><span class="font-label-mono-sm text-label-mono-sm uppercase tracking-wider">Stock</span></a></div></nav></body></html>
