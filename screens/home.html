@@ -40,13 +40,13 @@
 <h2 class="font-headline-md text-headline-md text-primary tracking-tight truncate">VektorMind</h2>
 <div class="flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded-full shrink-0">
 <span class="material-symbols-outlined text-[12px] text-primary-container">verified</span>
-<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed uppercase tracking-wider">LVL 5 AGI</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed uppercase tracking-wider" id="hero-agent-badge">…</span>
 </div>
 </div>
 <p class="font-label-mono-sm text-label-mono-sm text-on-surface-variant uppercase tracking-widest mt-0.5 truncate">CORE SWARM ORCHESTRATOR</p>
 <div class="inline-flex items-center gap-1.5 self-start mt-2 px-2 py-0.5 rounded bg-surface-container-highest">
 <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-ping"></span>
-<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed-dim uppercase tracking-wider">ACTIVE • AUTONOMOUS</span>
+<span class="font-label-mono-sm text-label-mono-sm text-primary-fixed-dim uppercase tracking-wider" id="hero-status-pill">CHECKING…</span>
 </div>
 </div>
 </div>
@@ -216,14 +216,17 @@
       setText("backend-status-text", ok ? "ONLINE" : String((h && h.status) || "UNKNOWN").toUpperCase());
       setText("ribbon-status-text", ok ? "SYSTEM ONLINE" : "SYSTEM OFFLINE");
       setText("backend-link-val", ok ? "CONNECTED \u2022 " + ms + "ms" : "UNREACHABLE");
+      setText("hero-status-pill", ok ? "BACKEND ONLINE" : "BACKEND OFFLINE");
       return V.vfGet("/api/info").then(function (info) {
         setText("backend-link-ver", "v" + (info.version || "?") + " \u2022 " + (info.agent_count || "?") + " agents");
         setText("hero-backend-ver", "BACKEND v" + (info.version || "?"));
+        setText("hero-agent-badge", (info.agent_count || "?") + " AGENTS");
       }).catch(function () {});
     }).catch(function (e) {
       setText("backend-status-text", "OFFLINE");
       setText("ribbon-status-text", "SYSTEM OFFLINE");
       setText("backend-link-val", "UNREACHABLE");
+      setText("hero-status-pill", "BACKEND OFFLINE");
       showError("task-feed", e);
     });
   }
@@ -237,7 +240,7 @@
   }
 
   function loadMissions() {
-    V.vfGet(MC + "/missions?limit=10").then(function (d) {
+    V.vfGet(MC + "/missions?limit=100").then(function (d) {
       var missions = d.missions || [];
       var done = missions.filter(function (m) { return m.state === "completed"; }).length;
       var failed = missions.filter(function (m) { return m.state === "failed"; }).length;

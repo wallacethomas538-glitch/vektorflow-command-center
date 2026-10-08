@@ -6,7 +6,7 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.6)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="VektorFlow Logo" class="h-8 w-auto object-contain shrink-0" src="assets/vektorflow-logo-pro.webp"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-wider uppercase text-primary truncate">VEKTORFLOW</span><div class="h-1.5 w-1.5 rounded-full bg-tertiary-container animate-pulse shadow-[0_0_8px_#22ef7e]"></div></div><span class="font-label-mono-sm text-label-mono-sm uppercase text-outline tracking-widest truncate">SYS: Missions</span></div></div><div class="flex items-center gap-space-sm shrink-0"><div class="flex items-center gap-space-xs bg-surface-container px-space-xs py-0.5 rounded-full shadow-[inset_0_1px_0_0_rgba(0,229,255,0.15)]"><span class="font-label-mono-sm text-label-mono-sm text-tertiary-fixed-dim uppercase px-1">ONLINE</span></div><div class="relative flex items-center justify-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_0_10px_rgba(0,229,255,0.25)]" src="assets/vektormind-avatar.png"/><div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-tertiary-container rounded-full ring-2 ring-surface-container-lowest"></div></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full px-margin space-y-space-md">
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.6)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="VektorFlow Logo" class="h-8 w-auto object-contain shrink-0" src="assets/vektorflow-logo-pro.webp"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-wider uppercase text-primary truncate">VEKTORFLOW</span><div class="h-1.5 w-1.5 rounded-full bg-tertiary-container animate-pulse shadow-[0_0_8px_#22ef7e]"></div></div><span class="font-label-mono-sm text-label-mono-sm uppercase text-outline tracking-widest truncate">SYS: Missions</span></div></div><div class="flex items-center gap-space-sm shrink-0"><div class="flex items-center gap-space-xs bg-surface-container px-space-xs py-0.5 rounded-full shadow-[inset_0_1px_0_0_rgba(0,229,255,0.15)]"><span class="font-label-mono-sm text-label-mono-sm text-tertiary-fixed-dim uppercase px-1" id="backend-status-text">…</span></div><div class="relative flex items-center justify-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_0_10px_rgba(0,229,255,0.25)]" src="assets/vektormind-avatar.png"/><div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-tertiary-container rounded-full ring-2 ring-surface-container-lowest"></div></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full px-margin space-y-space-md">
 <!-- Tactical Header & Metrics Strip -->
 <div class="flex items-end justify-between pt-space-sm">
 <div class="flex flex-col">
@@ -171,6 +171,7 @@
         setCount('filter-count-done', counts.completed);
         var pill = document.getElementById('ops-pill');
         if (pill) pill.textContent = (counts.active + counts.queued) + ' ACTIVE OPS';
+        var hp = document.getElementById('backend-status-text'); if (hp) hp.textContent = 'ONLINE';
         var list = document.getElementById('missionsList');
         if (list) {
           list.innerHTML = missions.length
@@ -182,6 +183,7 @@
         if (list) list.innerHTML = '<div class="p-space-md text-error font-label-mono-sm text-label-mono-sm">Couldn\'t reach backend &mdash; <button class="underline text-primary-container" onclick="loadMissions()">retry</button><div class="text-outline mt-1">' + window.VF.vfEscapeHtml(e.message) + '</div></div>';
         var pill = document.getElementById('ops-pill');
         if (pill) pill.textContent = 'OFFLINE';
+        var hp = document.getElementById('backend-status-text'); if (hp) hp.textContent = 'OFFLINE';
       });
     }
 
