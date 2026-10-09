@@ -87,7 +87,7 @@
       var out = document.getElementById('ad-output');
       var guidance = '';
       if (/not configured/i.test(msg)) {
-        guidance = '<div class="text-outline mt-1">That key belongs in the backend\'s Render environment as POLLINATIONS_ADS_KEY — it is never typed into this page. Add it there and redeploy.</div>';
+        guidance = '<div class="text-outline mt-1">That key belongs in the backend\'s Render environment as POLLINATIONS_API_KEY — it is never typed into this page. Add it there and redeploy.</div>';
       }
       out.innerHTML = '<div class="p-space-md text-error font-label-mono-sm text-label-mono-sm">Ad generation failed — <button class="underline text-primary-container" onclick="generateAd()">try again</button><div class="text-outline mt-1">' + window.VF.vfEscapeHtml(msg) + '</div>' + guidance + '</div>';
     }
