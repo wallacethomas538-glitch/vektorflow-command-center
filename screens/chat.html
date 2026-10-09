@@ -348,10 +348,17 @@
       typingBlock.classList.remove('hidden');
 
       // Real backend response -> POST /api/ai/chat
-      window.VF.vfPost('/api/ai/chat', { message: val }, { timeout: 90000 }).then((d) => {
+      window.VF.vfPost('/api/ai/chat', { message: val }, { timeout: 180000 }).then((d) => {
         typingBlock.classList.add('hidden');
         const raw = (d && typeof d.response === 'string') ? d.response : '';
         const isFallback = raw.trim() === "I'm here to help.";
+        const agentName = (d && d.dispatched_agent) ? String(d.dispatched_agent) : '';
+        const srcList = (d && Array.isArray(d.sources)) ? d.sources : [];
+        const sourcesHtml = srcList.length ? `<div class="mt-2.5 pt-2 flex flex-col gap-1">` + srcList.map(function (x) { return `<a href="${escapeHtml(x.url || '#')}" target="_blank" rel="noopener" class="font-label-mono-sm text-label-mono-sm text-primary-container underline truncate">${escapeHtml(x.title || x.url || 'source')}</a>`; }).join('') + `</div>` : '';
+        const browsedList = (d && Array.isArray(d.browsed)) ? d.browsed : [];
+        const browsedHtml = browsedList.length ? `<div class="mt-2"><span class="font-label-mono-sm text-label-mono-sm px-1.5 py-0.5 rounded bg-primary-container/15 text-primary-container">READ: ${browsedList.map(function (b) { return escapeHtml(b.url || ''); }).join(' ')}</span></div>` : '';
+        const noteText = (d && (d.search_note || d.browse_note)) || '';
+        const noteHtml = noteText ? `<div class="mt-2"><span class="font-label-mono-sm text-label-mono-sm px-1.5 py-0.5 rounded bg-[#ffb300]/15 text-[#ffb300]">${escapeHtml(noteText)}</span></div>` : '';
         const now2 = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const bubble = document.createElement('div');
         bubble.className = "flex items-start gap-space-sm max-w-[88%] self-start";
@@ -362,10 +369,11 @@
           <div class="flex flex-col gap-1 min-w-0">
             <div class="bg-surface-container-low/95 backdrop-blur-md rounded-2xl rounded-tl-sm p-space-md shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
               <div class="flex items-center justify-between gap-space-sm mb-1.5 pb-1">
-                <span class="font-headline-sm text-[13px] text-primary tracking-wide">VEKTORMIND</span>
+                <span class="font-headline-sm text-[13px] text-primary tracking-wide">${agentName ? escapeHtml(agentName.toUpperCase()) + ' — VIA VEKTORMIND' : 'VEKTORMIND'}</span>
                 <span class="font-label-mono-sm text-label-mono-sm text-outline">${now2}</span>
               </div>
               <p class="font-body-md text-body-md text-on-surface leading-relaxed" style="white-space: pre-wrap;">${raw ? escapeHtml(raw) : '<span class="text-outline">Empty response from backend.</span>'}</p>
+              ${browsedHtml}${sourcesHtml}${noteHtml}
               ${isFallback ? `<div class="mt-2.5 pt-2 flex items-center gap-space-sm"><span class="font-label-mono-sm text-label-mono-sm px-1.5 py-0.5 rounded bg-[#ffb300]/15 text-[#ffb300]">LLM OFFLINE — BACKEND RETURNED ITS FALLBACK. CHECK THE API KEY.</span></div>` : ''}
             </div>
           </div>
