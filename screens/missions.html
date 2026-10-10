@@ -141,6 +141,12 @@
       var V = window.VF;
       var meta = stateMeta(m.state);
       var mid = V.vfEscapeHtml(m.id);
+      // Real approval path: a mission in state `ready` can be approved by the
+      // commander via POST .../missions/{id}/transition {to_state:"approved"}.
+      // Only ever approves the mission shown on this card — never invents ids.
+      var approveHtml = (m.state === 'ready')
+        ? '<button type="button" class="mt-1 self-start h-9 px-4 rounded-xl bg-tertiary-container/20 text-tertiary font-label-mono-md text-label-mono-md tracking-wider uppercase active:scale-95 transition-all" onclick="approveMission(\'' + mid + '\', event)">APPROVE PLAN</button>'
+        : '';
       return '<div class="relative rounded-2xl bg-surface-container/70 backdrop-blur-md p-space-md shadow-[0_8px_32px_0_rgba(0,0,0,0.45)] overflow-hidden cursor-pointer" data-status="' + meta.key + '" onclick="toggleMissionDetail(\'' + mid + '\')">'
         + '<div class="absolute left-0 top-0 bottom-0 w-1.5 ' + meta.edge + '"></div>'
         + '<div class="flex flex-col pl-2 space-y-space-sm">'
@@ -152,8 +158,19 @@
         + '</div></div>'
         + '<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">' + V.vfEscapeHtml(m.objective || '(no objective)') + '</h3>'
         + '<div class="font-label-mono-sm text-label-mono-sm text-outline">' + fmtTime(m.created_at) + ' &bull; tap for tasks &amp; timeline</div>'
+        + approveHtml
         + '<div class="mission-detail hidden" id="detail-' + mid + '"></div>'
         + '</div></div>';
+    }
+
+    function approveMission(mid, ev) {
+      var V = window.VF;
+      if (ev && ev.stopPropagation) ev.stopPropagation(); // don't expand the card
+      if (!mid) return;
+      if (!window.confirm('Approve mission ' + String(mid).slice(0, 12) + '?\nThis transitions it to APPROVED on the backend (POST ' + MC + '/missions/{id}/transition).')) return;
+      V.vfPost(MC + '/missions/' + encodeURIComponent(mid) + '/transition', { to_state: 'approved', actor: 'commander', email: 'commander@vektorflow.com' })
+        .then(function () { loadMissions(); })
+        .catch(function (e) { window.alert('Approval failed: ' + e.message); });
     }
 
     function loadMissions() {
