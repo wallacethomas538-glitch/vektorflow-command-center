@@ -29,8 +29,8 @@
 <span class="font-label-mono-sm text-label-mono-sm px-1.5 py-0.5 rounded bg-surface-variant text-on-surface-variant uppercase tracking-wider" id="chat-ver-badge">…</span>
 </div>
 <div class="flex items-center gap-1.5 mt-0.5">
-<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container shadow-[0_0_6px_#22ef7e]"></span>
-<p class="font-label-mono-sm text-label-mono-sm text-tertiary-fixed-dim uppercase tracking-wider truncate">ACTIVE • READY FOR DIRECTIVES</p>
+<span class="w-1.5 h-1.5 rounded-full bg-[#ffb300] shadow-[0_0_6px_#ffb300]" id="chat-conn-dot"></span>
+<p class="font-label-mono-sm text-label-mono-sm text-outline uppercase tracking-wider truncate" id="chat-conn-text">CONNECTING…</p>
 </div>
 </div>
 </div>
@@ -279,7 +279,17 @@
       input.focus();
     });
 
-    // Backend presence check (real)
+    // Backend presence check (real) — also drives the header
+    // connection line: ACTIVE only when the backend actually answers.
+    function setChatConn(ok) {
+      var dot = document.getElementById('chat-conn-dot');
+      var txt = document.getElementById('chat-conn-text');
+      if (dot) dot.className = 'w-1.5 h-1.5 rounded-full ' + (ok ? 'bg-tertiary-container shadow-[0_0_6px_#22ef7e]' : 'bg-error shadow-[0_0_6px_#ffb4ab]');
+      if (txt) {
+        txt.textContent = ok ? 'ACTIVE \u2022 READY FOR DIRECTIVES' : 'OFFLINE \u2022 BACKEND UNREACHABLE';
+        txt.className = 'font-label-mono-sm text-label-mono-sm uppercase tracking-wider truncate ' + (ok ? 'text-tertiary-fixed-dim' : 'text-error');
+      }
+    }
     (function checkBackend() {
       var V = window.VF;
       var t0 = performance.now();
@@ -290,11 +300,13 @@
         var hp = document.getElementById('backend-status-text'); if (hp) hp.textContent = 'ONLINE';
         var sw = document.getElementById('chat-swarm');
         if (sw) sw.textContent = 'AGENTS: ' + n + ' REGISTERED';
+        setChatConn(true);
         var line = document.getElementById('chat-status-line');
         if (line) line.innerHTML = '<span class="font-label-mono-sm text-label-mono-sm text-tertiary uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-container-lowest">BACKEND LINKED \u2022 VEKTORMIND READY</span>';
       }).catch(function (e) {
         var line = document.getElementById('chat-status-line');
         var hp2 = document.getElementById('backend-status-text'); if (hp2) hp2.textContent = 'OFFLINE';
+        setChatConn(false);
         if (line) line.innerHTML = '<span class="font-label-mono-sm text-label-mono-sm text-error uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-container-lowest">BACKEND UNREACHABLE</span>';
       });
       V.vfGet('/api/info').then(function (info) {
