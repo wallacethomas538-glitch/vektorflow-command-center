@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>VektorMind 2.0 — Mission Theatre</title>
+<meta name="description" content="VektorMind 2.0 Mission Theatre — live mission control for the VektorFlow 15-agent system. Real data only, straight from the production backend."/>
+<link rel="stylesheet" href="css/mission.css"/>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <svg class="logo-v" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="vgrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#2dd4bf"/>
+        </linearGradient>
+      </defs>
+      <path d="M6 8 L24 42 L42 8 L33 8 L24 25 L15 8 Z" fill="url(#vgrad)"/>
+    </svg>
+    <div class="wordmark">
+      <div class="brand">VEKTORMIND&nbsp;2.0</div>
+      <div class="sub">Mission Theatre</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill" id="sys-pill"><span class="dot"></span><span id="sys-pill-text">CONNECTING</span></span>
+    <button class="refresh" id="btn-refresh" aria-label="Refresh all data" title="Refresh">&#10227;</button>
+  </header>
+
+  <!-- ============ VIEW: OVERVIEW ============ -->
+  <section class="view active" id="view-overview">
+    <div class="hero">
+      <div class="kicker">VektorFlow Software Systems</div>
+      <h1>Fifteen agents. One mission.<br/><span class="grad">Your business, moving.</span></h1>
+      <p class="lede">Mission control for the VektorMind 2.0 agent fleet — planned, policy-checked, human-approved, and evidence-gated. Every number on this page is read live from the production backend. Nothing is simulated.</p>
+      <div class="directive" id="hero-directive">Contacting the fleet&hellip;</div>
+      <div class="ledger-line">
+        <div>
+          <div class="ledger-big" id="ledger-calls">&mdash;</div>
+          <div class="ledger-note">API calls recorded by the live backend&rsquo;s analytics counter (in-memory; resets when the service restarts).</div>
+        </div>
+        <div>
+          <div class="ledger-big"><span id="ledger-missions">&mdash;</span></div>
+          <div class="ledger-note">Missions on record in mission control right now — including the ones that failed. We show those too.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cols-4">
+      <div class="card"><div class="card-title">System</div><div class="big" id="ov-system">&mdash;</div><div class="sub" id="ov-system-sub">checking /health</div></div>
+      <div class="card"><div class="card-title">Database</div><div class="big" id="ov-db">&mdash;</div><div class="sub" id="ov-db-sub">checking Supabase link</div></div>
+      <div class="card"><div class="card-title">Agents on deck</div><div class="big" id="ov-agents">&mdash;</div><div class="sub" id="ov-agents-sub">from /api/agents</div></div>
+      <div class="card"><div class="card-title">Missions open</div><div class="big" id="ov-open">&mdash;</div><div class="sub" id="ov-open-sub">from mission-control summary</div></div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-title">Mission board — by state</div>
+        <div id="ov-state-counts"><div class="skeleton">LOADING STATE COUNTS&hellip;</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Store snapshot — JoJoes Supply Co.</div>
+        <div id="ov-store"><div class="skeleton">LOADING STORE&hellip;</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="card-title">Backend activity — scheduled tasks</div>
+      <div id="ov-tasks"><div class="skeleton">LOADING TASKS&hellip;</div></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: MISSIONS ============ -->
+  <section class="view" id="view-missions">
+    <div class="view-head">
+      <h2>Missions</h2>
+      <p>The live mission board from mission control. States follow the real 11-state machine — tap a mission for its tasks, timeline, and Oracle&rsquo;s synthesis when the fleet produces one.</p>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div class="card-title">The 11-state machine</div>
+      <div class="state-strip" id="state-strip"><span class="skeleton">LOADING STATES&hellip;</span></div>
+    </div>
+    <div class="grid" id="missions-list" style="grid-template-columns:1fr;">
+      <div class="card"><div class="skeleton">LOADING MISSIONS&hellip;</div></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: DISPATCH ============ -->
+  <section class="view" id="view-dispatch">
+    <div class="view-head">
+      <h2>Dispatch</h2>
+      <p>Give the fleet an objective. VektorMind creates the mission, plans it across the 15 agents, and executes — inside the policy envelope, with approvals where the rules demand them.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-title">New mission</div>
+        <textarea id="dispatch-goal" rows="4" placeholder="Describe the mission objective&hellip; e.g. Research three new car-care products under $25 that fit our store"></textarea>
+        <div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn" id="dispatch-btn">Dispatch mission</button>
+          <span class="badge">create &rarr; plan &rarr; execute</span>
+        </div>
+        <div class="output" id="dispatch-output"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Talk to the fleet — agent chat</div>
+        <div id="chat-conn" class="sub" style="margin-bottom:8px;">Backend link: checking&hellip;</div>
+        <textarea id="chat-input" rows="3" placeholder="Ask the agent team anything&hellip;"></textarea>
+        <div style="margin-top:12px;">
+          <button class="btn ghost" id="chat-btn">Send to fleet</button>
+        </div>
+        <div class="chat-log" id="chat-log"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: AGENTS ============ -->
+  <section class="view" id="view-agents">
+    <div class="view-head">
+      <h2>The Fleet</h2>
+      <p>Fifteen specialized agents under VektorMind — research, sourcing, pricing, creative, orders, comms, policy, memory, synthesis. Statuses are read live from the backend.</p>
+    </div>
+    <div class="agent-grid" id="agents-grid" style="margin-top:14px;">
+      <div class="card"><div class="skeleton">LOADING AGENTS&hellip;</div></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: SAFETY ============ -->
+  <section class="view" id="view-safety">
+    <div class="view-head">
+      <h2>Safety &amp; Approvals</h2>
+      <p>The leash, on screen. A global kill switch covers tool calls <em>and</em> model calls. Money is out of scope by policy — no payments, no refunds, no payouts, ever. Anything sensitive waits for a human tap.</p>
+    </div>
+    <div class="killswitch" id="killswitch" style="margin-top:14px;">
+      <div class="card-title" style="justify-content:center;">Kill switch</div>
+      <div class="ks-state" id="ks-state">CHECKING&hellip;</div>
+      <div class="ks-sub" id="ks-sub">Reading live gateway status.</div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-title">Gateway boundaries — live</div>
+        <div id="gw-boundaries"><div class="skeleton">LOADING GATEWAY&hellip;</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Approval queue — waiting on a human</div>
+        <div id="approval-queue"><div class="skeleton">LOADING QUEUE&hellip;</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="card-title">The standing rules</div>
+      <p class="leash-note"><strong>Agents propose; Wallace approves.</strong> Customer-facing sends, store writes, and anything money-adjacent stop at the gate. A policy-blocked run reports <strong>FAILED</strong> — never a fake &ldquo;completed.&rdquo; Completion is evidence-gated: no evidence, no &ldquo;done.&rdquo;</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: META ============ -->
+  <section class="view" id="view-meta">
+    <div class="view-head">
+      <h2>Meta AI — Muse Spark</h2>
+      <p>The flagship brain for the hackathon demo. This panel reads the backend&rsquo;s Meta status route directly and shows exactly what it says — no simulated &ldquo;connected&rdquo; state, ever.</p>
+    </div>
+    <div id="meta-panel" style="margin-top:14px;">
+      <div class="card"><div class="skeleton">READING /api/meta/status&hellip;</div></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: STORE ============ -->
+  <section class="view" id="view-store">
+    <div class="view-head">
+      <h2>Store — JoJoes Supply Company</h2>
+      <p>Live catalog and orders from gojojoes.com via the production backend. Read-only in this theatre: the store team drafts, Wallace approves every write in Shopify.</p>
+    </div>
+    <div class="grid cols-3">
+      <div class="card"><div class="card-title">Products on record</div><div class="big" id="store-count">&mdash;</div><div class="sub">from /api/shopify/products</div></div>
+      <div class="card"><div class="card-title">Orders</div><div class="big" id="store-orders">&mdash;</div><div class="sub">from /api/shopify/orders</div></div>
+      <div class="card"><div class="card-title">Shipping promise</div><div class="big" style="font-size:21px;">Free at $70+</div><div class="sub">Standard $8 &bull; Express $15 — store policy</div></div>
+    </div>
+    <div class="view-head"><h2 style="font-size:17px;">Catalog</h2></div>
+    <div class="product-grid" id="product-grid">
+      <div class="card"><div class="skeleton">LOADING PRODUCTS&hellip;</div></div>
+    </div>
+    <div class="view-head"><h2 style="font-size:17px;">Orders</h2></div>
+    <div class="card"><div id="orders-box"><div class="skeleton">LOADING ORDERS&hellip;</div></div></div>
+  </section>
+
+  <!-- ============ VIEW: SECOND BRAIN ============ -->
+  <section class="view" id="view-brain">
+    <div class="view-head">
+      <h2>Second Brain — Termux Relay</h2>
+      <p>The phone-side relay that lets the fleet reach Wallace&rsquo;s Termux stack — and the line Hermes, the family&rsquo;s Operator on that phone, checks in on. This panel reports the relay&rsquo;s real state — including when it&rsquo;s down, and why the backend says so.</p>
+    </div>
+    <div id="brain-panel" style="margin-top:14px;">
+      <div class="card"><div class="skeleton">READING /api/second-brain/status&hellip;</div></div>
+    </div>
+  </section>
+
+  <footer class="colophon">VEKTORMIND 2.0 &bull; MISSION THEATRE &bull; REAL DATA ONLY &bull; VEKTORFLOW SOFTWARE SYSTEMS</footer>
+</div>
+
+<nav class="tabbar" id="tabbar">
+  <button data-view="overview" class="active"><span class="ic">&#9673;</span>Overview</button>
+  <button data-view="missions"><span class="ic">&#9873;</span>Missions</button>
+  <button data-view="dispatch"><span class="ic">&#10148;</span>Dispatch</button>
+  <button data-view="agents"><span class="ic">&#9783;</span>Fleet</button>
+  <button data-view="safety"><span class="ic">&#9960;</span>Safety</button>
+  <button data-view="meta"><span class="ic">&#10022;</span>Meta AI</button>
+  <button data-view="store"><span class="ic">&#9963;</span>Store</button>
+  <button data-view="brain"><span class="ic">&#9670;</span>2nd Brain</button>
+</nav>
+
+<script src="js/vf-config.js"></script>
+<script src="js/vf-api.js"></script>
+<script src="js/mt-app.js"></script>
+</body>
+</html>
