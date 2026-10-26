@@ -432,8 +432,8 @@
       setHtml("gw-boundaries", kvRows(gw));
     }).catch(function (e) {
       var box = el("killswitch");
-      box.className = "killswitch engaged";
-      setText("ks-state", "GATEWAY UNREACHABLE");
+      box.className = "killswitch";
+      setText("ks-state", "STATUS UNREPORTED");
       setText("ks-sub", "Could not read gateway status — state unknown, and this panel says so rather than guessing.");
       setHtml("gw-boundaries", errBox("loadSafety", e));
     });
@@ -454,10 +454,14 @@
   /* ---------------- meta panel ---------------- */
   function loadMeta() {
     V.vfGet("/api/meta/status").then(function (d) {
-      var connected = d && (d.connected === true || d.configured === true || d.status === "connected" || d.meta_served === true);
+      var chatReady = d && (d.chat && d.chat.ready === true || d.chat_model_ready === true || d.chat_ready === true
+        || (d.chat_model && typeof d.chat_model === "object" && d.chat_model.ready === true));
+      var imageReady = d && (d.image && d.image.ready === true || d.image_model_ready === true || d.image_ready === true
+        || (d.image_model && typeof d.image_model === "object" && d.image_model.ready === true));
+      var connected = d && d.configured === true && d.api_key_set === true && (chatReady || imageReady);
       setHtml("meta-panel",
         '<div class="card"><div class="card-title">Meta Model API — live status</div>'
-        + '<div class="big" style="color:' + (connected ? "var(--green)" : "var(--amber)") + ';">' + (connected ? "CONNECTED" : "ANSWERED — SEE FIELDS") + "</div>"
+        + '<div class="big" style="color:' + (connected ? "var(--green)" : "var(--amber)") + ';">' + (connected ? "CONNECTED" : "NOT LIVE") + "</div>"
         + '<div style="margin-top:10px;">' + kvRows(d) + "</div>"
         + '<p class="sub" style="margin-top:10px;">Rendered from the backend&rsquo;s own response — every field above is real.</p></div>');
     }).catch(function (e) {
@@ -551,7 +555,8 @@
     V.vfGet("/api/second-brain/status").then(function (d) {
       var online = d && d.relay_online === true;
       var relay = d && d.relay ? d.relay : null;
-      var jobs = (d && d.jobs) || [];
+      var rawJobs = d && d.jobs;
+      var jobs = Array.isArray(rawJobs) ? rawJobs : (rawJobs && typeof rawJobs === "object" ? [rawJobs] : []);
       var html = hermesCard(d, online, relay);
       html += '<div class="card"><div class="card-title">Termux relay — live state</div>';
       if (online) {
@@ -565,7 +570,12 @@
       }
       html += '<div class="card-title" style="margin-top:14px;">Relay jobs</div>';
       html += jobs.length
-        ? jobs.map(function (j) { return '<div class="kv"><span class="k">' + esc(j.id || j.job_id || "job") + '</span><span class="v">' + esc(j.status || j.state || "") + "</span></div>"; }).join("")
+        ? jobs.map(function (j) {
+          var id = j.id != null ? j.id : (j.job_id != null ? j.job_id : "job");
+          var state = j.status != null ? j.status : (j.state != null ? j.state : "");
+          var count = j.count != null ? " · count " + j.count : "";
+          return '<div class="kv"><span class="k">' + esc(String(id)) + '</span><span class="v">' + esc(String(state)) + esc(count) + "</span></div>";
+        }).join("")
         : emptyBox("No relay jobs on record.");
       html += "</div>";
       setHtml("brain-panel", html);
